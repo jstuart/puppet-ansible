@@ -21,6 +21,14 @@
 # [*sudo*]
 # set to 'enable' if you want to authorize ansible user to behave like root
 #
+# [*password*]
+# set to '*NP*' (the default) if you want to a passwordless ansible user
+# otherwise set to the desired password
+#
+# [*uid*]
+# set to '' if you want to enable the automatic assignment of UID/GID for the
+# ansible user, otherwise set to the desired UID value
+#
 # == Examples
 #
 # === Create a ansible user with a non valid password
@@ -41,15 +49,24 @@
 # }
 #
 class ansible::user(
-  $sudo = 'disable',
-  $password = '*NP*'
+  $sudo = 'enable',
+  $password = '*NP*',
+  $uid = '',
 ) {
 
   include ansible::params
 
+  if $uid != '' {
+    validate_re($ansible::user::uid, '^\d+$', "The value of \$uid must be numeric or an empty string. \$uid = ${ansible::user::uid}")
+    $real_uid = $ansible::user::uid
+  } else {
+    $real_uid = undef
+  }
+
   # Create an 'ansible' user
   user { 'ansible':
     ensure     => present,
+    uid        => $real_uid,
     comment    => 'ansible',
     managehome => true,
     shell      => '/bin/bash',

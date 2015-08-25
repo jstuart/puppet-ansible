@@ -34,6 +34,9 @@ class ansible::node(
     fail('master parameter must be set')
   }
 
+  # Create ansible user
+  require ansible::user
+
   # Export host key to store config
   @@sshkey { "ansible_${::fqdn}_rsa":
     host_aliases => [ $::fqdn, $::hostname, $::ipaddress ],
@@ -44,10 +47,5 @@ class ansible::node(
 
   # Authorize master host to connect via ssh by colleting its public key
   Ssh_authorized_key <<| tag == "ansible_master_${ansible::node::master}" |>>
-
-  # Create ansible user with sudo
-  class { 'ansible::user' :
-    sudo => 'enable'
-  }
 
 }

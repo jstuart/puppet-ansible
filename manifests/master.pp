@@ -47,10 +47,8 @@ class ansible::master(
 
   include ansible::params
 
-  # Create ansible user with sudo
-  class { 'ansible::user' :
-    sudo => 'enable'
-  }
+  # Create ansible user
+  require ansible::user
 
   # Install Ansible
   case $ansible::master::provider {

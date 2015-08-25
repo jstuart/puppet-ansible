@@ -77,4 +77,20 @@ describe 'ansible::user' do
 
   end
 
+  context 'When you add an ansible::user class with a uid parameter' do
+    let(:facts) { {:osfamily => 'Debian' } }
+    let(:params) { {:uid  => '432' } }
+
+    it 'an ansible user is created' do
+      should contain_user('ansible').with(
+        'ensure'     => 'present',
+        'uid'        => '432',
+        'name'       => 'ansible',
+        'shell'      => '/bin/bash',
+        'managehome' => 'true',
+        'password'   => '*NP*'
+      )
+    end
+
+  end
 end
